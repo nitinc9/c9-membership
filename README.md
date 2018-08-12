@@ -28,6 +28,7 @@ Following are the features supported.
 
 * Node.js 8+
 * npm 5.6+
+* MySQL 5.6+
 * Optional: Latest AWS CLI
 
 ## AWS Setup
@@ -97,8 +98,8 @@ http://localhost:9090/
 
 # Resources
 
-* Node.js installer
-  https://nodejs.org/en/download/
+* Node.js installer (or use homebrew)
+    https://nodejs.org/en/download/
 
 
 # Credits
