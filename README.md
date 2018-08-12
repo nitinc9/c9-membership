@@ -51,6 +51,10 @@ Note: The `c9-membership-app` in the above file is referred to as an AWS profile
 ```
 npm i
 ```
+* Generate encrypted password for database.
+```
+node password_util.js -enc
+```
 * Update `config.json` per your deployment.
   * Make sure to update the bucket name to the one created during AWS setup.
 
