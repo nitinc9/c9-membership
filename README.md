@@ -31,7 +31,9 @@ Following are the features supported.
 * MySQL 5.6+
 * Optional: Latest AWS CLI
 
-## AWS Setup
+## AWS Setup (optional for local deployment)
+
+Note: The AWS setup is optional for the local deployment. Only avatar related functionality will not be available without this.
 
 * Create an IAM user (say, `c9-membership-app`) with programmatic access and policy as specified in `resources/IAM/C9-Membership_App_Permissions.json`. Make sure to grab the access and secret keys and store these on your development machine under `${HOME}/.aws/credentials`. Example
 ```
