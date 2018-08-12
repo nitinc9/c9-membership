@@ -1,0 +1,39 @@
+{
+  "name": "c9-membership",
+  "version": "1.0.0",
+  "description": "A simple membership management application.",
+  "author": "Nitin Patil",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "build": "bestzip c9-membership.zip index.js password_util.js package.json config.json public routes node_modules",
+    "start": "node_modules/pm2/bin/pm2 start index.js --name c9-membership",
+    "stop": "node_modules/pm2/bin/pm2 stop c9-membership",
+    "install-service": "sudo env PATH=$PATH:/usr/local/bin /opt/app/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp /home/ec2-user; /opt/app/node_modules/pm2/bin/pm2 save",
+    "uninstall-service": "/opt/app/node_modules/pm2/bin/pm2 delete c9-membership; sudo env PATH=$PATH:/usr/local/bin /opt/app/node_modules/pm2/bin/pm2 unstartup systemd -u ec2-user --hp /home/ec2-user",
+    "status": "node_modules/pm2/bin/pm2 show c9-membership",
+    "deploy": "mkdir -p /tmp/c9-membership-tmp; cp config.json c9-membership.log /tmp/c9-membership-tmp 2>/dev/null; mkdir -p /tmp/node/app; cd /tmp/node/app; unzip -oq ../c9-membership.zip; cd /opt/app; /opt/app/node_modules/sync-files/bin/sync-files.js /tmp/node/app /opt/app; cp -f /tmp/c9-membership-tmp/* .; rm -rf /tmp/node/app; rm -rf /tmp/c9-membership-tmp",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.263.1",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "express-fileupload": "^0.4.0",
+    "express-session": "^1.15.6",
+    "jsonwebtoken": "^8.3.0",
+    "mysql": "^2.15.0",
+    "pm2": "^3.0.3",
+    "prompt": "^1.0.0",
+    "request": "^2.87.0",
+    "sync-files": "^1.0.3",
+    "uuid": "^3.2.1",
+    "winston": "^3.0.0"
+  },
+  "devDependencies": {
+    "bestzip": "^1.1.4",
+    "nodemon": "^1.17.5"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "host": "localhost",
+  "port": 9090,
+  "logLevel": "debug",
+  "adminEmail": "admin@example.com",
+  "database": {
+    "host": "<db-host>",
+    "port": 3306,
+    "user": "<db-user>",
+    "password": "<password>",
+    "dbName": "c9_membership",
+    "numPooledConnections": 1
+  },
+  "authentication": {
+    "secret": "<secret>",
+    "tokenValidity": 1800
+  },
+  "aws": {
+    "s3Bucket": "<s3-bucket>"
+  }
+}

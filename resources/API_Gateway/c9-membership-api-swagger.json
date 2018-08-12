@@ -1,0 +1,423 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2018-08-11T18:54:30Z",
+    "title": "c9-membership-api"
+  },
+  "host": "<api-id>.execute-api.us-east-1.amazonaws.com",
+  "basePath": "/c9-membership",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "description": "Login as a member.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "401": {
+            "description": "401 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "500 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "uri": "http://<ec2-public-ip>:9090/api/login",
+          "responses": {
+            "4\\d{2}": {
+              "statusCode": "401"
+            },
+            "default": {
+              "statusCode": "200"
+            },
+            "5\\d{2}": {
+              "statusCode": "500"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "http"
+        }
+      }
+    },
+    "/members": {
+      "get": {
+        "description": "Retrieves the list of members (admin only).",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Members"
+            }
+          },
+          "401": {
+            "description": "401 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "500 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "uri": "http://<ec2-public-ip>:9090/api/members",
+          "responses": {
+            "4\\d{2}": {
+              "statusCode": "401"
+            },
+            "default": {
+              "statusCode": "200"
+            },
+            "5\\d{2}": {
+              "statusCode": "500"
+            }
+          },
+          "requestParameters": {
+            "integration.request.header.x-access-token": "method.request.header.x-access-token"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "GET",
+          "type": "http"
+        }
+      },
+      "post": {
+        "description": "Creates a member.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "Member",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Member"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          },
+          "500": {
+            "description": "500 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "uri": "http://<ec2-public-ip>:9090/api/members",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            },
+            "5\\d{2}": {
+              "statusCode": "500"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "http"
+        }
+      }
+    },
+    "/members/{id}": {
+      "get": {
+        "description": "Retrieves the specified member details.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Member"
+            }
+          },
+          "401": {
+            "description": "401 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "500 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "uri": "http://<ec2-public-ip>:9090/api/members/{id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            },
+            "4\\d{2}": {
+              "statusCode": "401"
+            },
+            "5\\d{2}": {
+              "statusCode": "500"
+            }
+          },
+          "requestParameters": {
+            "integration.request.path.id": "method.request.path.id",
+            "integration.request.header.x-access-token": "method.request.header.x-access-token"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "GET",
+          "type": "http"
+        }
+      },
+      "delete": {
+        "description": "Deletes the specified member.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "x-access-token",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          },
+          "401": {
+            "description": "401 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "500 response",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "uri": "http://<ec2-public-ip>:9090/api/members/{id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            },
+            "4\\d{2}": {
+              "statusCode": "401"
+            },
+            "5\\d{2}": {
+              "statusCode": "500"
+            }
+          },
+          "requestParameters": {
+            "integration.request.path.id": "method.request.path.id",
+            "integration.request.header.x-access-token": "method.request.header.x-access-token"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "DELETE",
+          "type": "http"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Empty": {
+      "type": "object",
+      "title": "Empty Model"
+    },
+    "LoginResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "id": {
+          "type": "number"
+        },
+        "isAdmin": {
+          "type": "boolean"
+        },
+        "token": {
+          "type": "string"
+        }
+      },
+      "title": "Login Response Model"
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      },
+      "title": "Error Model"
+    },
+    "Success": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "title": "Success Model"
+    },
+    "Member": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "number"
+        },
+        "lastName": {
+          "type": "boolean"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "title": "Member Model"
+    },
+    "Members": {
+      "type": "object",
+      "properties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Member"
+        }
+      },
+      "title": "Members Model"
+    }
+  },
+  "x-amazon-apigateway-documentation": {
+    "version": "1.0.0",
+    "createdDate": "2018-08-11T18:08:23Z",
+    "documentationParts": [
+      {
+        "location": {
+          "type": "API"
+        },
+        "properties": {
+          "description": "C9-Membership REST API"
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "path": "/login",
+          "method": "POST"
+        },
+        "properties": {
+          "description": "Login as a member."
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "path": "/members/{id}",
+          "method": "GET"
+        },
+        "properties": {
+          "description": "Retrieves the specified member details."
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "path": "/members/{id}",
+          "method": "DELETE"
+        },
+        "properties": {
+          "description": "Deletes the specified member."
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "path": "/members",
+          "method": "GET"
+        },
+        "properties": {
+          "description": "Retrieves the list of members (admin only)."
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "path": "/members",
+          "method": "POST"
+        },
+        "properties": {
+          "description": "Creates a member."
+        }
+      }
+    ]
+  }
+}

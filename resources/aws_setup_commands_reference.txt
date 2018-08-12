@@ -1,0 +1,229 @@
+# Set the following environment variables
+export jumper=<jumper-public-ip>
+export instance=<instance-private-ip>
+export dbinstance=<dbinstance-private-dns>
+
+# Generate an SSH keypair (choose all defaults)
+ssh-keygen -t rsa -b 4096
+
+# Establish an SSH session with the jumper
+ssh -i ~/.ssh/C9SSHKeyPair.pem ec2-user@$jumper
+
+# Copy a file from local file to jumper
+scp -i ~/.ssh/C9SSHKeyPair.pem <file-path> ec2-user@$jumper:/tmp
+
+# Start an SSH tunnel to the App EC2 instance
+ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-user@$jumper
+
+# Connect to the App EC2 instance using SSH tunnel
+ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost
+
+
+# Copy file(s) to the App EC2 instance using SSH tunnel
+scp -i ~/.ssh/C9SSHKeyPair.pem -P 1122 <file1> ... ec2-user@localhost:/tmp
+
+# Copy application sources to the App EC2 instance using SSH tunnel
+scp -r -i ~/.ssh/C9SSHKeyPair.pem -P 1122 src/node/* ec2-user@localhost:/opt/app
+
+# Start an SSH tunnel to the RDS instance
+ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306 ec2-user@$jumper
+
+
+#
+# Development App Setup on AWS: One time (from c9-membership directory)
+# 
+# instance=<dev-ec2-private-ip>
+#
+
+# Download application sources (use the following command or the GIT desktop client)
+git clone https://github.com/nitinc9/c9-membership
+
+# Change directory to c9-membership
+cd c9-membership
+
+# Establish the SSH tunnel to the RDS instance
+ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306 ec2-user@$jumper
+
+# Create database and schema using a local SQL client
+
+# Establish the SSH tunnel
+ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-user@$jumper
+
+# Copy sources from your LOCAL machine via the SSH tunnel to a temporary location
+ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost "mkdir -p /tmp/node"
+scp -r -i ~/.ssh/C9SSHKeyPair.pem -P 1122 src/node/* ec2-user@localhost:/tmp/node
+
+# SSH to the EC2 instance via the tunnel
+ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost
+
+# Run the following commands after doing SSH to the app EC2 instance
+
+# Install nodejs (Ref: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html)
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash
+. ~/.nvm/nvm.sh
+nvm install 8.11.3
+node -v
+
+# Set up application structure
+sudo mkdir -p /opt/app
+sudo chown -R ec2-user:ec2-user /opt/app
+
+# Copy sources to the app folder and clean up
+cp -r /tmp/node/* /opt/app
+rm -rf /tmp/node/*
+
+# Install node packages
+cd /opt/app
+npm i
+
+# Start application in development mode (to exit hit Ctrl+C)
+cd /opt/app
+npm run dev
+
+
+#
+# QA App Setup on AWS: One time (from c9-membership directory)
+# 
+# instance=<qa-ec2-private-ip>
+#
+
+# Download application sources (use the following command or the GIT desktop client)
+git clone https://github.com/nitinc9/c9-membership
+
+# Change directory to c9-membership
+cd c9-membership
+
+# Establish the SSH tunnel to the RDS instance
+ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306 ec2-user@$jumper
+
+# Create database and schema using a local SQL client
+
+# Establish the SSH tunnel to the EC2 instance
+ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-user@$jumper
+
+# Copy application distribution from your LOCAL machine via the SSH tunnel to a temporary location
+cd src/node
+npm run build
+ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost "mkdir -p /tmp/node"
+scp -i ~/.ssh/C9SSHKeyPair.pem -P 1122 c9-membership.zip ec2-user@localhost:/tmp/node
+ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost "cd /tmp/node; unzip c9-membership.zip"
+cd ../..
+
+# Prepare nodejs offline install
+wget http://nodejs.org/dist/v8.11.3/node-v8.11.3-linux-x64.tar.gz
+scp -i ~/.ssh/C9SSHKeyPair.pem -P 1122 node-v8.11.3-linux-x64.tar.gz ec2-user@localhost:/tmp
+rm node-v8.11.3-linux-x64.tar.gz
+
+# SSH to the EC2 instance via the tunnel
+ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost
+
+# Run the following commands after doing SSH to the app EC2 instance
+
+# Install nodejs (offline install)
+sudo tar -C /usr/local --strip-components 1 -xzf /tmp/node-v8.11.3-linux-x64.tar.gz
+rm -f /tmp/node-v8.11.3-linux-x64.tar.gz
+
+# Set up application structure
+sudo mkdir -p /opt/app
+sudo chown -R ec2-user:ec2-user /opt/app
+
+# Copy sources to the app folder and clean up
+cp -r /tmp/node/* /opt/app
+rm -rf /tmp/node/*
+
+# Edit /opt/app/config.json for correct values
+
+# Start application as daemon
+cd /opt/app
+npm run start
+
+# Keep application running across server reboots
+npm run install-service
+
+# Stop application (daemon)
+cd /opt/app
+npm run stop
+
+# Restart application (daemon)
+cd /opt/app
+npm run restart
+
+# Show application status
+cd /opt/app
+npm run status
+
+# Uninstall application as a service
+npm run uninstall-service
+
+
+#
+# CloudWatch Agent Setup (ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-first-instance.html)
+#
+
+# Download and install the agent
+mkdir -p /tmp/CWAgent
+cd /tmp/CWAgent
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip
+unzip AmazonCloudWatchAgent.zip
+sudo ./install.sh
+cd /opt/aws/amazon-cloudwatch-agent/etc
+rm -rf /tmp/CWAgent
+
+# Set up CloudWatch agent configuration file (ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html)
+sudo bash -c 'cat << EOF > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+{
+  "metrics": {
+    "metrics_collected": {
+      "mem": {
+        "measurement": [
+          "mem_free",
+          "mem_used",
+          "mem_total"
+        ],
+        "append_dimensions": {
+          "InstanceId": "i-0a260d299b5fd05f2"
+        },
+        "metrics_collection_interval": 300
+      },
+      "disk": {
+        "resources": [
+          "/",
+          "/tmp"
+        ],
+        "measurement": [
+          {"name": "free", "rename": "DISK_FREE", "unit": "Gigabytes"},
+          "used",
+          "total"
+        ],
+        "ignore_file_system_types": [
+          "sysfs", "devtmpfs"
+        ],
+        "append_dimensions": {
+          "InstanceId": "i-0a260d299b5fd05f2"
+        },
+        "metrics_collection_interval": 600
+      }
+    },
+    "aggregation_dimensions": [["InstanceId"]]
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/opt/app/c9-membership.log",
+            "log_group_name": "c9-membership-app.log",
+            "log_stream_name": "c9-membership.log",
+            "timezone": "UTC",
+            "timestamp_format": "%Y-%m-%d %H:%M:%S"
+          }
+        ]
+      }
+    }
+  }
+}
+EOF'
+
+# Start CloudWatch agent
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+
