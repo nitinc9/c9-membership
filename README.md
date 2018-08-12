@@ -46,6 +46,10 @@ Note: The `c9-membership-app` in the above file is referred to as an AWS profile
 
 ## Setup
 
+* Clone the GIT repo.
+```
+git clone https://github.com/nitinc9/c9-membership
+```
 * Create the database using the `src/scripts/db/create_db.sql`. Change the database name, user name and password, if needed.
 * Create the database schema using the `src/scripts/db/create_schema.sql`.
 * Switch to the `src/node` directory.
