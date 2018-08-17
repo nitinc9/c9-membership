@@ -1,13 +1,34 @@
+#
+# Description: Command reference for working with AWS setup.
+#
+# General guide
+# - export command is used to set a shell variable.
+# - ~ refers to the user's home directory.
+#
+
+
+#
+# Common Setup
+#
+
 # Set the following environment variables
 export jumper=<jumper-public-ip>
 export instance=<instance-private-ip>
 export dbinstance=<dbinstance-private-dns>
+
+
+#
+# Jumper related commands
+#
 
 # Generate an SSH keypair (choose all defaults)
 ssh-keygen -t rsa -b 4096
 
 # Establish an SSH session with the jumper
 ssh -i ~/.ssh/C9SSHKeyPair.pem ec2-user@$jumper
+
+# Copy the SSH keypair file to jumper
+scp -i ~/.ssh/C9SSHKeyPair.pem ~/.ssh/C9SSHKeyPair.pem ec2-user@<jumper-public-ip>:~/.ssh
 
 # Copy a file from local file to jumper
 scp -i ~/.ssh/C9SSHKeyPair.pem <file-path> ec2-user@$jumper:/tmp
@@ -17,7 +38,6 @@ ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-
 
 # Connect to the App EC2 instance using SSH tunnel
 ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost
-
 
 # Copy file(s) to the App EC2 instance using SSH tunnel
 scp -i ~/.ssh/C9SSHKeyPair.pem -P 1122 <file1> ... ec2-user@localhost:/tmp

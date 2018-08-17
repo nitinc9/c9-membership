@@ -1,0 +1,24 @@
+#
+# awslogs utility sample commands.
+#
+
+# List log groups
+awslogs groups
+
+# List log streams in a specified group
+awslogs streams c9-membership-app.log
+
+# Use a specific AWS profile as configured in the 'credentials' file (such as, dev, production)
+awslogs streams c9-membership-app.log --profile dev
+
+# Retrieve logs from any stream within the specified log group in last 1 hour
+awslogs get c9-membership-app.log -s1h
+
+# Retrieve logs from any stream within the specified time range
+awslogs get c9-membership-app.log -s '2018-08-15 21:15' -e '2018-08-15 22:30'
+
+# Filter logs using the specified pattern
+awslogs get c9-membership-app.log -s1h --filter-pattern=debug
+
+# Watch logs in the specified log group as they change
+awslogs get c9-membership-app.log --watch

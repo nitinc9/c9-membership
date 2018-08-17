@@ -1,0 +1,23 @@
+#
+# Sample AWS CLI Commands
+#
+# Note: The CLI usage assumes proper credentials have been configured.
+#
+
+# Retrieve a list of EC2 instances as JSON
+aws ec2 describe-instances
+
+# Retrieve first instance
+aws ec2 describe-instances --query 'Reservations[0].Instances[0]'
+
+# Retrieve specific fields as text with custom labels
+aws ec2 describe-instances --query 'Reservations[].Instances[].[InstanceId,PrivateIpAddress]' --output text
+
+# Retrieve (InstanceId, Private IP and Instance Name) in a tabular format
+aws ec2 describe-instances --query 'Reservations[].Instances[].[InstanceId,PrivateIpAddress,Tags[?Key==`Name`] | [0].Value]' --output table
+
+# List S3 buckets
+aws s3 ls
+
+# List S3 bucket folder content
+aws s3 ls s3://c9-membership/avatars/
