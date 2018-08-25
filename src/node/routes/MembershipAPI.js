@@ -196,6 +196,7 @@ module.exports = class MembershipAPI {
         var member = {};
         if (Array.isArray(data) && data.length > 0) {
           member = data[0];
+          member['avatar'] = member['avatar'] ? member['avatar'] : DEFAULT_AVATAR;
         }
         return callback(null, response, member);
       }
@@ -261,7 +262,7 @@ module.exports = class MembershipAPI {
     var avatar = request.files ? request.files.avatar : null;
     var requiredFields = [];
     if (request.files) {
-      logger.debug("MembershipAPI::updateMember(): Avatar supplied, uploading it to S3 bucket '%s'...", self.config.aws.bucket);
+      logger.debug("MembershipAPI::updateMember(): Avatar supplied, uploading it to S3 bucket '" + self.config.aws.bucket + "'");
     }
     if (!firstName) {
       requiredFields.push('First Name');
@@ -272,13 +273,12 @@ module.exports = class MembershipAPI {
     if (requiredFields.length > 0) {
       return callback(new Error("Missing required field(s)"), response, this.prepareErrorResponse("Following field(s) are required: " + JSON.stringify(requiredFields)));
     }
-    var avatar_file = avatar ? avatar.name : DEFAULT_AVATAR;
-    var stmt = "update member set first_name=?, last_name=?, avatar=? where ID=?";
-    var params = [firstName, lastName, avatar_file, id];
+    var stmt = "update member set first_name=?, last_name=? where ID=?";
+    var params = [firstName, lastName, id];
     var maskFields = null;
     if (password) {
-      stmt = "update member set first_name=?, last_name=?, password=SHA1(?), avatar=? where ID=?";
-      params = [firstName, lastName, password, avatar_file, id];
+      stmt = "update member set first_name=?, last_name=?, password=SHA1(?) where ID=?";
+      params = [firstName, lastName, password, id];
       maskFields = [2];
     }
     this.executeDBRequest(stmt, params, maskFields, function(err, data) {
@@ -300,8 +300,19 @@ module.exports = class MembershipAPI {
               return callback(err, response);
             }
             else {
-              data = {"status": "success"};
-              return callback(null, response, data);
+              // File uploaded to S3 successfully
+              logger.debug("MembershipAPI::updateMember(): Avatar '" + avatar.name + "' uploaded to S3 bucket successfully");
+              var stmt = "update member set avatar=? where ID=?";
+              var params = [avatar.name, id];
+              self.executeDBRequest(stmt, params, null, function(err, data) {
+                if (err) {
+                  return callback(err, response);
+                }
+                else {
+                  data = {"status": "success"};
+                  return callback(null, response, data);
+                }
+              });
             }
           });
         }

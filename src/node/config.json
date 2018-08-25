@@ -4,18 +4,18 @@
   "logLevel": "debug",
   "adminEmail": "admin@example.com",
   "database": {
-    "host": "<db-host>",
+    "host": "localhost",
     "port": 3306,
-    "user": "<db-user>",
-    "password": "<password>",
+    "user": "c9_member",
+    "password": "48e0bf3d1c741b6114f9d0a3188ed9e9",
     "dbName": "c9_membership",
     "numPooledConnections": 1
   },
   "authentication": {
-    "secret": "<secret>",
+    "secret": "c9-membership",
     "tokenValidity": 1800
   },
   "aws": {
-    "s3Bucket": "<s3-bucket>"
+    "s3Bucket": "c9-membership"
   }
 }

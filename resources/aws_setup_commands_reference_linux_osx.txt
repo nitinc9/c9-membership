@@ -1,5 +1,5 @@
 #
-# Description: Command reference for working with AWS setup.
+# Description: Linux/OSX Command reference for working with AWS setup.
 #
 # General guide
 # - export command is used to set a shell variable.
@@ -28,10 +28,13 @@ ssh-keygen -t rsa -b 4096
 ssh -i ~/.ssh/C9SSHKeyPair.pem ec2-user@$jumper
 
 # Copy the SSH keypair file to jumper
-scp -i ~/.ssh/C9SSHKeyPair.pem ~/.ssh/C9SSHKeyPair.pem ec2-user@<jumper-public-ip>:~/.ssh
+scp -i ~/.ssh/C9SSHKeyPair.pem ~/.ssh/C9SSHKeyPair.pem ec2-user@$jumper:~/.ssh
 
-# Copy a file from local file to jumper
+# Copy a file from local machine to jumper
 scp -i ~/.ssh/C9SSHKeyPair.pem <file-path> ec2-user@$jumper:/tmp
+
+# Run a command against the jumper
+ssh -i ~/.ssh/C9SSHKeyPair.pem ec2-user@$jumper "ls /tmp"
 
 # Start an SSH tunnel to the App EC2 instance
 ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-user@$jumper
@@ -44,6 +47,9 @@ scp -i ~/.ssh/C9SSHKeyPair.pem -P 1122 <file1> ... ec2-user@localhost:/tmp
 
 # Copy application sources to the App EC2 instance using SSH tunnel
 scp -r -i ~/.ssh/C9SSHKeyPair.pem -P 1122 src/node/* ec2-user@localhost:/opt/app
+
+# Run a command against the EC2 via jumper
+ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost "ls /tmp"
 
 # Start an SSH tunnel to the RDS instance
 ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306 ec2-user@$jumper
