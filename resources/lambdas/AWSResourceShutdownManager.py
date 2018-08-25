@@ -2,8 +2,13 @@
 #
 # Author: Nitin Patil (cloudnineapps.com)
 #
-# Usage: Schedule via cron (CloudWatch scheduled rule)
-# - Example: 0 18-23,0-9 * * ? * (Every hour between 6pm-9am UTC)
+# Usage:
+# - Optional: Set the 'ec2NameFilter' global variable to specify a name pattern for the EC2 instances. Examples
+#   *dev*
+#   c9-membership-app-* 
+#   c9-membership-app-dev 
+# - Schedule via cron (CloudWatch scheduled rule). Example
+#   0 18-23,0-9 * * ? * (Every hour between 6pm-9am UTC)
 #
 
 import boto3
@@ -12,12 +17,14 @@ import logging
 # Globals
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+ec2NameFilter = "*"
 
 def lambda_handler(event, context):
     # Shutdown EC2 instances
     logger.info("Retrieving instances")
     ec2 = boto3.client('ec2')
-    response = ec2.describe_instances()
+    filters = [{'Name': 'tag:Name', 'Values':[ec2NameFilter]}]
+    response = ec2.describe_instances(Filters=filters)
     logger.debug("EC2 response: %s" % response)
     instance_ids = []
     for reservation in response["Reservations"]:
