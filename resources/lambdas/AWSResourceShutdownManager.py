@@ -21,7 +21,7 @@ ec2NameFilter = "*"
 
 def lambda_handler(event, context):
     # Shutdown EC2 instances
-    logger.info("Retrieving instances")
+    logger.info("Retrieving instances matching pattern: %s" % ec2NameFilter)
     ec2 = boto3.client('ec2')
     filters = [{'Name': 'tag:Name', 'Values':[ec2NameFilter]}]
     response = ec2.describe_instances(Filters=filters)
