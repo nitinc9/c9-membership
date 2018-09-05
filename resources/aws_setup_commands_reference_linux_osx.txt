@@ -56,12 +56,12 @@ ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306
 
 
 #
-# Development App Setup on AWS: One time (from c9-membership directory)
+# Development App Setup on AWS: One time
 # 
 # instance=<dev-ec2-private-ip>
 #
 
-# Download application sources (use the following command or the GIT desktop client)
+# Download application sources (use the GIT CLI or the GIT desktop client)
 git clone https://github.com/nitinc9/c9-membership
 
 # Change directory to c9-membership
@@ -72,7 +72,7 @@ ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306
 
 # Create database and schema using a local SQL client
 
-# Establish the SSH tunnel
+# Establish the SSH tunnel to the EC2 instance
 ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-user@$jumper
 
 # Copy sources from your LOCAL machine via the SSH tunnel to a temporary location
@@ -108,12 +108,12 @@ npm run dev
 
 
 #
-# QA App Setup on AWS: One time (from c9-membership directory)
+# QA App Setup on AWS: One time
 # 
 # instance=<qa-ec2-private-ip>
 #
 
-# Download application sources (use the following command or the GIT desktop client)
+# Download application sources (use the GIT CLI or the GIT desktop client)
 git clone https://github.com/nitinc9/c9-membership
 
 # Change directory to c9-membership
@@ -183,6 +183,7 @@ npm run uninstall-service
 
 
 #
+# Run the following commands after doing SSH to the app EC2 instance
 # CloudWatch Agent Setup (ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-first-instance.html)
 #
 

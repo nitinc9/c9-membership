@@ -81,92 +81,90 @@ plink -N -L 13306:%dbinstance%:3306 -load infra-jumper
 
 
 REM
-REM Development App Setup on AWS: One time (from c9-membership directory)
+REM Development App Setup on AWS: One time
 REM 
 REM instance=<dev-ec2-private-ip>
 REM
 
-REM Download application sources (use the following command or the GIT desktop client)
+REM Download application sources (use the GIT CLI or the GIT desktop client)
 git clone https://github.com/nitinc9/c9-membership
 
 REM Change directory to c9-membership
 cd c9-membership
 
 REM Establish the SSH tunnel to the RDS instance
-ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306 ec2-user@$jumper
+plink -N -L 113306:%dbinstance%:3306 -load infra-jumper
 
 REM Create database and schema using a local SQL client
 
-REM Establish the SSH tunnel
-ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-user@$jumper
+REM Establish the SSH tunnel to the EC2 instance
+plink -N -L 1122:%instance%:22 -load infra-jumper
 
 REM Copy sources from your LOCAL machine via the SSH tunnel to a temporary location
-ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost "mkdir -p /tmp/node"
-scp -r -i ~/.ssh/C9SSHKeyPair.pem -P 1122 src/node/* ec2-user@localhost:/tmp/node
+plink -i C:\Users\Administrator\C9SSHKeyPair.ppk -P 1122 ec2-user@localhost "mkdir -p /tmp/node"
+pscp -i C:\Users\Administrator\C9SSHKeyPair.ppk -P 1122 src/node/* ec2-user@localhost:/tmp/node
 
 REM SSH to the EC2 instance via the tunnel
-ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost
 
 REM Run the following commands after doing SSH to the app EC2 instance
 
-REM Install nodejs (Ref: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html)
+# Install nodejs (Ref: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html)
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash
 . ~/.nvm/nvm.sh
 nvm install 8.11.3
 node -v
 
-REM Set up application structure
+# Set up application structure
 sudo mkdir -p /opt/app
 sudo chown -R ec2-user:ec2-user /opt/app
 
-REM Copy sources to the app folder and clean up
+# Copy sources to the app folder and clean up
 cp -r /tmp/node/* /opt/app
 rm -rf /tmp/node/*
 
-REM Install node packages
+# Install node packages
 cd /opt/app
 npm i
 
-REM Start application in development mode (to exit hit Ctrl+C)
+# Start application in development mode (to exit hit Ctrl+C)
 cd /opt/app
 npm run dev
 
 
 REM
-REM QA App Setup on AWS: One time (from c9-membership directory)
+REM QA App Setup on AWS: One time
 REM 
 REM instance=<qa-ec2-private-ip>
 REM
 
-REM Download application sources (use the following command or the GIT desktop client)
+REM Download application sources (use the GIT CLI or the GIT desktop client)
 git clone https://github.com/nitinc9/c9-membership
 
 REM Change directory to c9-membership
 cd c9-membership
 
 REM Establish the SSH tunnel to the RDS instance
-ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L13306:$dbinstance:3306 ec2-user@$jumper
+plink -N -L 113306:%dbinstance%:3306 -load infra-jumper
 
 REM Create database and schema using a local SQL client
 
 REM Establish the SSH tunnel to the EC2 instance
-ssh -i ~/.ssh/C9SSHKeyPair.pem -fN -o ConnectTimeout=30 -L1122:$instance:22 ec2-user@$jumper
+plink -N -L 1122:%instance%:22 -load infra-jumper
 
 REM Copy application distribution from your LOCAL machine via the SSH tunnel to a temporary location
 cd src/node
 npm run build
-ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost "mkdir -p /tmp/node"
-scp -i ~/.ssh/C9SSHKeyPair.pem -P 1122 c9-membership.zip ec2-user@localhost:/tmp/node
-ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost "cd /tmp/node; unzip c9-membership.zip"
+plink -i C:\Users\Administrator\C9SSHKeyPair.ppk -P 1122 ec2-user@localhost "mkdir -p /tmp/node"
+pscp -i C:\Users\Administrator\C9SSHKeyPair.ppk -P 1122 c9-membership.zip ec2-user@localhost:/tmp/node
+plink -i C:\Users\Administrator\C9SSHKeyPair.ppk -P 1122 ec2-user@localhost "cd /tmp/node; unzip c9-membership.zip"
 cd ../..
 
-REM Prepare nodejs offline install
+REM Prepare nodejs offline install (or download the installer from the following URL)
 wget http://nodejs.org/dist/v8.11.3/node-v8.11.3-linux-x64.tar.gz
-scp -i ~/.ssh/C9SSHKeyPair.pem -P 1122 node-v8.11.3-linux-x64.tar.gz ec2-user@localhost:/tmp
-rm node-v8.11.3-linux-x64.tar.gz
+pscp -i C:\Users\Administrator\C9SSHKeyPair.ppk -P 1122 node-v8.11.3-linux-x64.tar.gz ec2-user@localhost:/tmp
+del node-v8.11.3-linux-x64.tar.gz
 
 REM SSH to the EC2 instance via the tunnel
-ssh -i ~/.ssh/C9SSHKeyPair.pem -p 1122 ec2-user@localhost
 
 REM Run the following commands after doing SSH to the app EC2 instance
 
@@ -208,6 +206,7 @@ npm run uninstall-service
 
 
 REM
+REM Run the following commands after doing SSH to the app EC2 instance
 REM CloudWatch Agent Setup (ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-first-instance.html)
 REM
 
