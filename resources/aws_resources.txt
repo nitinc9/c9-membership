@@ -39,7 +39,7 @@ RDS
 - DB Identifier: c9appsdb
 - Credentials: dbadmin/<password>
 - VPC: infra-vpc (new subnet group)
-- VPC Security Group: New
+- VPC Security Group: infra-vpc-db-sg
 - Database Name: c9_membership
 - Backup Retention: 0 days
 - Enable Auto Minor Version Upgrade: Yes
