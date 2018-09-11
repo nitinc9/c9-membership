@@ -33,7 +33,7 @@ Following are the features supported.
 
 ## Typical Application Flow
 
-![Typical Application Flow](docs/C9-Membership_Login_Sequence_Diagram.png?raw=true Title="C9-Membership Login Sequence Diagram")
+![Typical Application Flow](docs/C9-Membership_Login_Sequence_Diagram.png?raw=true "C9-Membership Login Sequence Diagram")
 
 * The browser issues a request that's eventually handled by the `MembershipUI`.
 * `MembershipUI` invokes a REST API on the `MembershipAPI` passing in a callback to handle the API response.
