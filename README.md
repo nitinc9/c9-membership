@@ -31,6 +31,14 @@ Following are the features supported.
 * MySQL 5.6+
 * Optional: Latest AWS CLI
 
+## Typical Application Flow
+
+!(Typical Application Flow)[docs/C9-Membership_Login_Sequence_Diagram.png?raw=true]
+
+* The browser issues a request that's eventually handled by the `MembershipUI`.
+* `MembershipUI` invokes a REST API on the `MembershipAPI` passing in a callback to handle the API response.
+* The API response callback prepares the appropriate HTML response and returns back to the browser.  
+
 ## AWS Setup (optional for local deployment)
 
 Note: The AWS setup is optional for the local deployment. Only avatar related functionality will not be available without this.
