@@ -37,7 +37,8 @@ Following are the features supported.
 
 * The browser issues a request that's eventually handled by the `MembershipUI`.
 * `MembershipUI` invokes a REST API on the `MembershipAPI` passing in a callback to handle the API response.
-* The API response callback prepares the appropriate HTML response and returns back to the browser.  
+* `MembershipAPI` calls the API response callback with the results of processing. 
+* The callback prepares the appropriate HTML response and sends it back to the browser.  
 
 ## AWS Setup (optional for local deployment)
 
