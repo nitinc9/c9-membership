@@ -117,6 +117,8 @@ http://localhost:9090/
 
 # Resources
 
+* Link to online course material that covers application's design, development and deployment in AWS.
+    https://cloudnineapps.com/courses/cloud-computing/aws-advanced-for-developers/
 * Node.js installer (or use homebrew)
     https://nodejs.org/en/download/
 
